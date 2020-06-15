@@ -1,0 +1,6 @@
+project Day1 is
+  for Source_Dirs use (".");
+  for Object_Dir use "obj";
+  for Exec_Dir use "obj";
+  for Main use ("day1.adb");
+end Day1;
