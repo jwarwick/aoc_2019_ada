@@ -3,4 +3,8 @@ project Day1 is
   for Object_Dir use "obj";
   for Exec_Dir use "obj";
   for Main use ("main.adb");
+
+  package Builder is
+    for Executable ("main.adb") use "day1";
+  end Builder;
 end Day1;
