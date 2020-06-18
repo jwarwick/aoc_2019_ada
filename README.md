@@ -8,7 +8,14 @@ Not available in Homebrew, download this package: (https://www.adacore.com/downl
 ## How to Build
 ```
 % cd day01
-% gprbuild
+% gprbuild -P day1
 % ./obj/day1
+```
+
+## How to Test
+```
+% cd day01
+% gprbuild -P harness
+% ./obj/test_day1
 ```
 
