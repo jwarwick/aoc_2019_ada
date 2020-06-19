@@ -3,9 +3,11 @@
 package Day1 is
   type Mass is new Natural;
 
-  function fuel_for_modules(filename : in String) return Mass;
-  function total_fuel(weight : in Mass) return Mass;
+  procedure load_modules(filename : in String);
+  function fuel_for_modules return Mass;
+  function total_fuel return Mass;
 
   private
   function fuel_required(weight : in Mass) return Integer;
+  function recursive_fuel_required(weight : in Mass) return Mass;
 end Day1;
