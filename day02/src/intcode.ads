@@ -5,12 +5,13 @@ with Ada.Containers.Vectors;
 
 package IntCode is
   procedure load(s : String);
+  procedure load_file(path : String);
   procedure eval;
 
   procedure poke(addr : Natural; value : Integer);
   function peek(addr : Natural) return Integer;
 
-  procedure dump;
+  function dump return String;
 
   private
   package Memory_Vector is new Ada.Containers.Vectors(Index_Type => Natural, Element_Type => Integer);

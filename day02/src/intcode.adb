@@ -1,4 +1,5 @@
 -- IntCode Interpreter
+with Ada.Strings.Unbounded;
 with Ada.Strings.Maps;
 with Ada.Strings.Hash;
 with Ada.Strings.Fixed;
@@ -9,7 +10,32 @@ package body IntCode is
 
   function integer_hash(i: Integer) return Ada.Containers.Hash_Type is (Ada.Strings.Hash(Integer'Image(i)));
 
-  pc : Memory_Vector.Cursor;
+  type Program_Counter is new Natural;
+  pc : Program_Counter;
+  function to_pc(i : Integer) return Program_Counter is (Program_Counter(i));
+  function to_index(p : Program_Counter) return Natural is (Natural(p));
+
+  function val(offset : Integer) return Integer is (memory(memory(offset + to_index(pc))));
+  function val_a(offset : Integer := 1) return Integer renames val;
+  function val_b(offset : Integer := 2) return Integer renames val;
+  function loc_c return Integer is (memory(to_index(pc) + 3));
+
+  procedure increment_pc(s : Integer := 4) is
+  begin
+    pc := to_pc(to_index(pc) + s);
+  end increment_pc;
+
+  procedure load_file(path : String) is
+    file : TIO.File_Type;
+  begin
+    TIO.open(File => file, Mode => TIO.In_File, Name => path);
+    declare
+      str : String := TIO.get_line(file);
+    begin
+      load(str);
+    end;
+    TIO.close(file);
+  end load_file;
 
   procedure load(s : String) is
     start : Natural := s'First;
@@ -27,12 +53,27 @@ package body IntCode is
       end if;
       start := finish + 1;
     end loop;
-    pc := memory.first;
+    pc := to_pc(memory.first_index);
   end load;
 
   procedure eval is
+    should_halt : Boolean := False;
+    val : Integer;
   begin
-    null;
+    pc := to_pc(memory.first_index);
+    while not(should_halt) loop
+      val := memory(to_index(pc));
+      case OpCode_Map(val) is
+        when Add =>
+          memory(loc_c) := val_a + val_b;
+          increment_pc;
+        when Mult =>
+          memory(loc_c) := val_a * val_b;
+          increment_pc;
+        when Halt =>
+          should_halt := True;
+      end case;
+    end loop;
   end eval;
 
   procedure poke(addr : Natural; value : Integer) is
@@ -42,12 +83,14 @@ package body IntCode is
 
   function peek(addr : Natural) return Integer is (memory(addr));
 
-  procedure dump is
+  function dump return String is
+    package Unbounded renames Ada.Strings.Unbounded;
+    str : Ada.Strings.Unbounded.Unbounded_String;
   begin
     for m of memory loop
-      TIO.put(Integer'Image(m) & ", ");
+      Unbounded.append(str, (Integer'Image(m) & ", "));
     end loop;
-    TIO.new_line;
+    return Unbounded.to_string(str);
   end dump;
 
 begin

@@ -41,6 +41,35 @@ package body IntCode.Test is
 
    end Test_Poke;
 
+   procedure Test_Eval (T : in out AUnit.Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
+
+      type Memory_Array is array(Integer range <>) of Integer;
+      function to_memory(a : Memory_Array) return Memory_Vector.Vector is
+        m : Memory_Vector.Vector;
+      begin
+        for val of a loop
+          m.append(val);
+        end loop;
+        return m;
+      end to_memory;
+
+      procedure eval_test(input : in Memory_Array; expected : in Memory_Array; desc : in String) is
+        use type Memory_Vector.Vector;
+        m : Memory_Vector.Vector := to_memory(input);
+        e : Memory_Vector.Vector := to_memory(expected);
+      begin
+        memory := m;
+        eval;
+        Assert(memory = e, desc & ", got: " & dump);
+      end eval_test;
+   begin
+     eval_test((1, 0, 0, 0, 99), (2, 0, 0, 0, 99), "Simple add test");
+     eval_test((2,3,0,3,99), (2,3,0,6,99), "Simple mult test");
+     eval_test((2,4,4,5,99,0), (2,4,4,5,99,9801), "Bigger mult test");
+     eval_test((1,1,1,4,99,5,6,0,99), (30,1,1,4,2,5,6,0,99), "Multiple write test");
+   end Test_Eval;
+
    function Name (T : Test) return AUnit.Message_String is
       pragma Unreferenced (T);
    begin
@@ -52,6 +81,7 @@ package body IntCode.Test is
    begin
      Register_Routine (T, Test_Load'Access, "Loading");
      Register_Routine (T, Test_Poke'Access, "Peek/Poke");
+     Register_Routine (T, Test_Eval'Access, "Evaluation");
    end Register_Tests;
 
 end IntCode.Test;

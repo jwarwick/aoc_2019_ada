@@ -11,5 +11,6 @@ package IntCode.Test is
    -- Test routines
    procedure Test_Load (T : in out AUnit.Test_Cases.Test_Case'Class);
    procedure Test_Poke (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Eval (T : in out AUnit.Test_Cases.Test_Case'Class);
 
 end IntCode.Test;
