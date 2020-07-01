@@ -1,0 +1,18 @@
+with "aunit";
+with "day3"; -- name of the main project .gpr file
+
+project Harness is
+   for Main use ("test_day.adb");
+   for Source_Dirs use ("tests");
+   for Exec_Dir use "obj";
+   for Object_Dir use "obj";
+
+   package Compiler is
+     for Default_Switches ("ada") use ("-g", "-s", "-gnata", "-gnato");
+   end Compiler;
+
+   package Linker is
+      for Default_Switches ("ada") use ("-g");
+   end Linker;
+end Harness;
+
