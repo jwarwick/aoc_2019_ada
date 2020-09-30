@@ -11,5 +11,6 @@ package FMS.Test is
    -- Test routines
    procedure Test_Load (T : in out AUnit.Test_Cases.Test_Case'Class);
    procedure Test_Closest (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Shortest (T : in out AUnit.Test_Cases.Test_Case'Class);
 
 end FMS.Test;

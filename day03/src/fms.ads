@@ -23,10 +23,12 @@ package FMS is
   type Position is record
     x : Integer := 0;
     y : Integer := 0;
+    dist : Natural := 0;
   end record;
   function hash(p : in Position) return Ada.Containers.Hash_Type;
+  function equivalent_positions(left, right: Position) return Boolean;
 
-  package Wire_Points is new Ada.Containers.Hashed_Sets(Element_Type => Position, Hash => hash, Equivalent_Elements => "=");
+  package Wire_Points is new Ada.Containers.Hashed_Sets(Element_Type => Position, Hash => hash, Equivalent_Elements => equivalent_positions);
   wire_points_1 : Wire_Points.Set;
   wire_points_2 : Wire_Points.Set;
 end FMS;

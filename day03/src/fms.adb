@@ -31,7 +31,7 @@ package body FMS is
 
   function to_string(p : in Position) return String is
   begin
-    return "(" & Integer'IMAGE(p.x) & "," & Integer'IMAGE(p.y) & ")";
+    return "(" & Integer'IMAGE(p.x) & "," & Integer'IMAGE(p.y) & "): " & Natural'IMAGE(p.dist);
   end to_string;
 
   function distance(p : in Position) return Natural is
@@ -43,6 +43,11 @@ package body FMS is
   begin
     return Ada.Strings.Hash(p.x'IMAGE & "," & p.y'IMAGE);
   end hash;
+
+  function equivalent_positions(left, right: Position) return Boolean is
+  begin
+    return (left.x = right.x) and then (left.y = right.y);
+  end equivalent_positions;
 
   -- function "=" (left : in Position; right : in Position) return Boolean is
   -- begin
@@ -95,10 +100,10 @@ package body FMS is
   procedure step(pos : in out Position; dir : in Direction) is
   begin
     case dir is
-      when Up => pos := (x => pos.x, y => pos.y - 1);
-      when Down => pos := (x => pos.x, y => pos.y + 1);
-      when Left => pos := (x => pos.x - 1, y => pos.y);
-      when Right => pos := (x => pos.x + 1, y => pos.y);
+      when Up => pos := (x => pos.x, y => pos.y - 1, dist => pos.dist + 1);
+      when Down => pos := (x => pos.x, y => pos.y + 1, dist => pos.dist + 1);
+      when Left => pos := (x => pos.x - 1, y => pos.y, dist => pos.dist + 1);
+      when Right => pos := (x => pos.x + 1, y => pos.y, dist => pos.dist + 1);
     end case;
   end step;
 
@@ -111,7 +116,7 @@ package body FMS is
   end expand;
 
   procedure expand_segments(w : in Wire.Vector; points : in out Wire_Points.Set) is
-    start_pos : constant Position := (x => 0, y => 0);
+    start_pos : constant Position := (x => 0, y => 0, dist => 0);
     curr_pos : Position := start_pos;
   begin
     points.clear;
@@ -159,7 +164,23 @@ package body FMS is
   end closest_intersection;
 
   function shortest_intersection return Positive is
+    use Wire_Points;
+    best : Positive := Positive'LAST;
+    in_common : constant Wire_Points.Set := wire_points_1 and wire_points_2; 
   begin
-    return 2;
+    for elt of in_common loop
+      declare
+        e1 : constant cursor := find(wire_points_1, elt);
+        d1 : constant natural := element(e1).dist;
+        e2 : constant cursor := find(wire_points_2, elt);
+        d2 : constant natural := element(e2).dist;
+        curr : constant Natural := d1 + d2;
+      begin
+        if curr < best then
+          best := curr;
+        end if;
+      end;
+    end loop;
+    return best;
   end shortest_intersection;
 end FMS;
