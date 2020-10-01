@@ -7,5 +7,5 @@ procedure main is
     last : constant Natural := 585159;
 begin
   put_line("Part 1: " & Positive'Image(Password.part1_count(first, last)));
-  -- put_line("Part 2: " & Positive'Image(FMS.shortest_intersection));
+  put_line("Part 2: " & Positive'Image(Password.part2_count(first, last)));
 end main;
