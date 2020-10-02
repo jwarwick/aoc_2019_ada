@@ -8,6 +8,18 @@ with Ada.Text_IO;
 package body IntCode is
   package TIO renames Ada.Text_IO;
 
+  procedure append_input(val : Integer) is
+  begin
+    input_vector.append(val);
+  end append_input;
+
+  function take_output return Integer is
+    val : constant Integer := output_vector.First_Element;
+  begin
+    output_vector.Delete_First;
+    return val;
+  end take_output;
+
   function integer_hash(i: Integer) return Ada.Containers.Hash_Type is (Ada.Strings.Hash(Integer'Image(i)));
 
   type Program_Counter is new Natural;
@@ -18,6 +30,8 @@ package body IntCode is
   function val(offset : Integer) return Integer is (memory(memory(offset + to_index(pc))));
   function val_a(offset : Integer := 1) return Integer renames val;
   function val_b(offset : Integer := 2) return Integer renames val;
+  function loc_a return Integer is (memory(to_index(pc) + 1));
+  function loc_b return Integer is (memory(to_index(pc) + 2));
   function loc_c return Integer is (memory(to_index(pc) + 3));
 
   procedure increment_pc(s : Integer := 4) is
@@ -70,6 +84,13 @@ package body IntCode is
         when Mult =>
           memory(loc_c) := val_a * val_b;
           increment_pc;
+        when Input =>
+          memory(loc_a) := input_vector.First_Element;
+          input_vector.Delete_First;
+          increment_pc(2);
+        when Output =>
+          output_vector.Append(val_a);
+          increment_pc(2);
         when Halt =>
           should_halt := True;
       end case;
@@ -96,6 +117,8 @@ package body IntCode is
 begin
   OpCode_Map.insert(1, Add);
   OpCode_Map.insert(2, Mult);
+  OpCode_Map.insert(3, Input);
+  OpCode_Map.insert(4, Output);
   OpCode_Map.insert(99, Halt);
 
 end IntCode;
